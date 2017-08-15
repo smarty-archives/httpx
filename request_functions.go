@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"sync"
 
-	"github.com/smartystreets/pipeline/numeric"
+	"github.com/smartystreets/numeric"
 )
 
 func ReadClientIPAddress(request *http.Request) string {
