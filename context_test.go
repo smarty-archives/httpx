@@ -1,10 +1,9 @@
 package httpx
 
 import (
+	"net/http"
 	"net/http/httptest"
 	"testing"
-
-	"net/http"
 
 	"github.com/smartystreets/assertions/should"
 	"github.com/smartystreets/gunit"
@@ -34,5 +33,3 @@ func (this *ContextFixture) TestContextSetValue() {
 	values := this.request.Context().Value(contextNamespace).(map[interface{}]interface{})
 	this.So(values["KEY"], should.Equal, "VALUE")
 }
-
-
