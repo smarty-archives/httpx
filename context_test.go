@@ -20,12 +20,19 @@ type ContextFixture struct {
 }
 
 func (this *ContextFixture) Setup() {
-	this.request = httptest.NewRequest("GET", "/", nil)
+	this.request = InitializeContext(httptest.NewRequest("GET", "/", nil))
 }
 
 func (this *ContextFixture) TestContextInitialization() {
-	request := InitializeContext(this.request)
-	actual := request.Context().Value(contextNamespace)
+	actual := this.request.Context().Value(contextNamespace)
 	expected := map[interface{}]interface{}{}
 	this.So(actual, should.Resemble, expected)
 }
+
+func (this *ContextFixture) TestContextSetValue() {
+	Contextual(*this.request).Set("KEY", "VALUE")
+	values := this.request.Context().Value(contextNamespace).(map[interface{}]interface{})
+	this.So(values["KEY"], should.Equal, "VALUE")
+}
+
+
