@@ -11,35 +11,32 @@ func InitializeContext(request *http.Request) *http.Request {
 	return request.WithContext(child)
 }
 
-type Contextual http.Request
-
-func (this Contextual) Set(key, value interface{}) {
-	this.getContextValues()[key] = value
+func SetContext(request *http.Request, key, value interface{}) {
+	contextValues(request)[key] = value
 }
 
-func (this Contextual) getContextValues() map[interface{}]interface{} {
-	request := http.Request(this)
-	namespace := request.Context().Value(contextNamespace)
-	return namespace.(map[interface{}]interface{})
+func GetContext(request *http.Request, key interface{}) interface{} {
+	return contextValues(request)[key]
 }
-
-func (this Contextual) Int(key string) int {
-	value, _ := this.getContextValues()[key].(int)
+func GetContextInt(request *http.Request, key interface{}) int {
+	value, _ := GetContext(request, key).(int)
 	return value
 }
-func (this Contextual) Int64(key string) int64 {
-	value, _ := this.getContextValues()[key].(int64)
+func GetContextInt64(request *http.Request, key interface{}) int64 {
+	value, _ := GetContext(request, key).(int64)
+	return value
+}
+func GetContextUint64(request *http.Request, key interface{}) uint64 {
+	value, _ := GetContext(request, key).(uint64)
+	return value
+}
+func GetContextString(request *http.Request, key interface{}) string {
+	value, _ := GetContext(request, key).(string)
 	return value
 }
 
-func (this Contextual) Uint64(key string) uint64 {
-	value, _ := this.getContextValues()[key].(uint64)
-	return value
-}
-
-func (this Contextual) String(key string) string {
-	value, _ := this.getContextValues()[key].(string)
-	return value
+func contextValues(request *http.Request) map[interface{}]interface{} {
+	return request.Context().Value(contextNamespace).(map[interface{}]interface{})
 }
 
 const contextNamespace = "smartystreets"
