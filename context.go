@@ -7,38 +7,32 @@ import (
 
 func InitializeContext(request *http.Request) *http.Request {
 	parent := request.Context()
-	child := context.WithValue(parent, contextNamespace, make(map[interface{}]interface{}))
+	child := context.WithValue(parent, contextNamespace, make(Namespace))
 	return request.WithContext(child)
 }
 
-type Contextual http.Request
-
-func (this Contextual) Set(key, value interface{}) {
-	this.getContextValues()[key] = value
+func Context(request *http.Request) Namespace {
+	return request.Context().Value(contextNamespace).(Namespace)
 }
 
-func (this Contextual) getContextValues() map[interface{}]interface{} {
-	request := http.Request(this)
-	namespace := request.Context().Value(contextNamespace)
-	return namespace.(map[interface{}]interface{})
-}
+type Namespace map[interface{}]interface{}
 
-func (this Contextual) Int(key string) int {
-	value, _ := this.getContextValues()[key].(int)
+func (this Namespace) Int(key string) int {
+	value, _ := this[key].(int)
 	return value
 }
-func (this Contextual) Int64(key string) int64 {
-	value, _ := this.getContextValues()[key].(int64)
+func (this Namespace) Int64(key string) int64 {
+	value, _ := this[key].(int64)
 	return value
 }
 
-func (this Contextual) Uint64(key string) uint64 {
-	value, _ := this.getContextValues()[key].(uint64)
+func (this Namespace) Uint64(key string) uint64 {
+	value, _ := this[key].(uint64)
 	return value
 }
 
-func (this Contextual) String(key string) string {
-	value, _ := this.getContextValues()[key].(string)
+func (this Namespace) String(key string) string {
+	value, _ := this[key].(string)
 	return value
 }
 

@@ -22,47 +22,30 @@ func (this *ContextFixture) Setup() {
 	this.request = InitializeContext(httptest.NewRequest("GET", "/", nil))
 }
 
-func (this *ContextFixture) TestContextInitialization() {
-	actual := this.request.Context().Value(contextNamespace)
-	expected := map[interface{}]interface{}{}
-	this.So(actual, should.Resemble, expected)
-}
-
-func (this *ContextFixture) TestContextSetValue_ThenAvailableOnContextMap() {
-	Contextual(*this.request).Set("KEY", "VALUE")
-	values := this.request.Context().Value(contextNamespace).(map[interface{}]interface{})
-	this.So(values["KEY"], should.Equal, "VALUE")
+func (this *ContextFixture) TestNamespaceAccessBeforeInitialization_ShouldPanic() {
+	uninitialized := httptest.NewRequest("GET", "/", nil)
+	this.So(func() { Context(uninitialized)["KEY"] = 1 }, should.Panic)
+	this.So(func() { Context(uninitialized).Int("KEY") }, should.Panic)
+	this.So(func() { Context(uninitialized).Int64("KEY") }, should.Panic)
+	this.So(func() { Context(uninitialized).Uint64("KEY") }, should.Panic)
+	this.So(func() { Context(uninitialized).String("KEY") }, should.Panic)
 }
 
 func (this *ContextFixture) TestContextGetValue_WhenNotThere_ProvideDefaultValue() {
-	values := Contextual(*this.request)
-
-	this.So(values.Int("KEY"), should.Equal, 0)
-	this.So(values.Int64("KEY"), should.Equal, 0)
-	this.So(values.Uint64("KEY"), should.Equal, 0)
-	this.So(values.String("KEY"), should.Equal, "")
+	this.So(Context(this.request).Int("KEY"), should.Equal, 0)
+	this.So(Context(this.request).Int64("KEY"), should.Equal, 0)
+	this.So(Context(this.request).Uint64("KEY"), should.Equal, 0)
+	this.So(Context(this.request).String("KEY"), should.Equal, "")
 }
 
-func (this *ContextFixture) TestContextSetValue_Int() {
-	values := Contextual(*this.request)
-	values.Set("INT", int(1))
-	this.So(values.Int("INT"), should.Equal, int(1))
-}
+func (this *ContextFixture) TestAfterInitialization_ReturnsStoredValues() {
+	Context(this.request)["INT"] = int(1)
+	Context(this.request)["INT64"] = int64(1)
+	Context(this.request)["UINT64"] = uint64(1)
+	Context(this.request)["STRING"] = "hi"
 
-func (this *ContextFixture) TestContextSetValue_Int64() {
-	values := Contextual(*this.request)
-	values.Set("INT64", int64(1))
-	this.So(values.Int64("INT64"), should.Equal, int64(1))
-}
-
-func (this *ContextFixture) TestContextSetValue_Uint64() {
-	values := Contextual(*this.request)
-	values.Set("UINT64", uint64(1))
-	this.So(values.Uint64("UINT64"), should.Equal, uint64(1))
-}
-
-func (this *ContextFixture) TestContextSetValue_string() {
-	values := Contextual(*this.request)
-	values.Set("STRING", "hi")
-	this.So(values.String("STRING"), should.Equal, "hi")
+	this.So(Context(this.request).Int("INT"), should.Equal, int(1))
+	this.So(Context(this.request).Int64("INT64"), should.Equal, int64(1))
+	this.So(Context(this.request).Uint64("UINT64"), should.Equal, uint64(1))
+	this.So(Context(this.request).String("STRING"), should.Equal, "hi")
 }
