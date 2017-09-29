@@ -17,21 +17,21 @@ func Context(request *http.Request) Namespace {
 
 type Namespace map[interface{}]interface{}
 
-func (this Namespace) Int(key string) int {
+func (this Namespace) Int(key interface{}) int {
 	value, _ := this[key].(int)
 	return value
 }
-func (this Namespace) Int64(key string) int64 {
+func (this Namespace) Int64(key interface{}) int64 {
 	value, _ := this[key].(int64)
 	return value
 }
 
-func (this Namespace) Uint64(key string) uint64 {
+func (this Namespace) Uint64(key interface{}) uint64 {
 	value, _ := this[key].(uint64)
 	return value
 }
 
-func (this Namespace) String(key string) string {
+func (this Namespace) String(key interface{}) string {
 	value, _ := this[key].(string)
 	return value
 }
