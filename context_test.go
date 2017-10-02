@@ -39,11 +39,13 @@ func (this *ContextFixture) TestContextGetValue_WhenNotThere_ProvideDefaultValue
 }
 
 func (this *ContextFixture) TestAfterInitialization_ReturnsStoredValues() {
+	Context(this.request)["INTERFACE"] = struct{}{}
 	Context(this.request)["INT"] = int(1)
 	Context(this.request)["INT64"] = int64(1)
 	Context(this.request)["UINT64"] = uint64(1)
 	Context(this.request)["STRING"] = "hi"
 
+	this.So(Context(this.request)["INTERFACE"], should.Resemble, struct{}{})
 	this.So(Context(this.request).Int("INT"), should.Equal, int(1))
 	this.So(Context(this.request).Int64("INT64"), should.Equal, int64(1))
 	this.So(Context(this.request).Uint64("UINT64"), should.Equal, uint64(1))
