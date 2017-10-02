@@ -2,8 +2,14 @@ package httpx
 
 import (
 	"context"
+	"io"
 	"net/http"
+	"net/http/httptest"
 )
+
+func NewContextualRequest(method, address string, body io.Reader) *http.Request {
+	return InitializeContext(httptest.NewRequest(method, address, body))
+}
 
 func InitializeContext(request *http.Request) *http.Request {
 	parent := request.Context()

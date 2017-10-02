@@ -15,11 +15,12 @@ func TestContextFixture(t *testing.T) {
 
 type ContextFixture struct {
 	*gunit.Fixture
+
 	request *http.Request
 }
 
 func (this *ContextFixture) Setup() {
-	this.request = InitializeContext(httptest.NewRequest("GET", "/", nil))
+	this.request = NewContextualRequest("GET", "/", nil)
 }
 
 func (this *ContextFixture) TestNamespaceAccessBeforeInitialization_ShouldPanic() {
