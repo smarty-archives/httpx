@@ -7,7 +7,9 @@ import (
 	"net/http/httptest"
 )
 
-func NewContextualRequest(method, address string, body io.Reader) *http.Request {
+// NewRequest creates a request using httptest.NewRequest and initializes
+// its context for use with the Context function.
+func NewRequest(method, address string, body io.Reader) *http.Request {
 	return InitializeContext(httptest.NewRequest(method, address, body))
 }
 

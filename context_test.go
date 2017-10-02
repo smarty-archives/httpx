@@ -20,7 +20,7 @@ type ContextFixture struct {
 }
 
 func (this *ContextFixture) Setup() {
-	this.request = NewContextualRequest("GET", "/", nil)
+	this.request = NewRequest("GET", "/", nil)
 }
 
 func (this *ContextFixture) TestNamespaceAccessBeforeInitialization_ShouldPanic() {
