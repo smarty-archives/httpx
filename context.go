@@ -13,13 +13,17 @@ func NewRequest(method, address string, body io.Reader) *http.Request {
 	return InitializeContext(httptest.NewRequest(method, address, body))
 }
 
+type ContextualRequest interface {
+	Context() context.Context
+}
+
 func InitializeContext(request *http.Request) *http.Request {
 	parent := request.Context()
 	child := context.WithValue(parent, contextNamespace, make(Namespace))
 	return request.WithContext(child)
 }
 
-func Context(request *http.Request) Namespace {
+func Context(request ContextualRequest) Namespace {
 	return request.Context().Value(contextNamespace).(Namespace)
 }
 
