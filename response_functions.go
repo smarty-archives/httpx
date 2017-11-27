@@ -30,7 +30,7 @@ func WriteErrorMessage(response http.ResponseWriter, message string, statusCode 
 
 func WriteRequest(response http.ResponseWriter, request *http.Request, message string, status int) {
 	dump, _ := httputil.DumpRequest(request, false)
-	http.Error(response, fmt.Sprintf("%d %s\n\nRaw Request:\n\n%s\n\n%s", status, message, string(dump)), status)
+	http.Error(response, fmt.Sprintf("%d %s\n\nRaw Request:\n\n%s", status, message, string(dump)), status)
 }
 
 func WriteJSON(contents interface{}, response http.ResponseWriter) {
