@@ -44,6 +44,8 @@ func WritePrettyJSON(contents interface{}, response http.ResponseWriter) {
 	encoder.Encode(contents)
 }
 
-const ContentTypeHeader = "Content-Type"
-const MIMEApplicationJSON = "application/json; charset=utf-8"
-const MIMETextPlain = "text/plain; charset=utf-8"
+const (
+	ContentTypeHeader   = "Content-Type"
+	MIMEApplicationJSON = "application/json; charset=utf-8"
+	MIMETextPlain       = "text/plain; charset=utf-8"
+)
