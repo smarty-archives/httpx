@@ -1,7 +1,6 @@
 package httpx
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -40,11 +39,9 @@ func WriteJSON(contents interface{}, response http.ResponseWriter) {
 
 func WritePrettyJSON(contents interface{}, response http.ResponseWriter) {
 	response.Header().Set(ContentTypeHeader, MIMEApplicationJSON)
-
-	payload, _ := json.Marshal(contents)
-	var buffer bytes.Buffer
-	json.Indent(&buffer, payload, "", "\t")
-	buffer.WriteTo(response)
+	encoder := json.NewEncoder(response)
+	encoder.SetIndent("", "\t")
+	encoder.Encode(contents)
 }
 
 const ContentTypeHeader = "Content-Type"
