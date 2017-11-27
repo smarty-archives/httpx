@@ -25,13 +25,11 @@ func WriteError(response http.ResponseWriter, err error, statusCode int) {
 }
 
 func WriteErrorMessage(response http.ResponseWriter, message string, statusCode int) {
-	response.Header().Set(ContentTypeHeader, MIMETextPlain)
 	http.Error(response, message, statusCode)
 }
 
 func WriteRequest(response http.ResponseWriter, request *http.Request, message string, status int) {
 	dump, _ := httputil.DumpRequest(request, false)
-	response.Header().Set(ContentTypeHeader, MIMETextPlain)
 	http.Error(response, fmt.Sprintf("%d %s\n\nRaw Request:\n\n%s\n\n%s", status, message, string(dump)), status)
 }
 
