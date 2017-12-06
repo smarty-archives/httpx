@@ -38,7 +38,7 @@ func (this *ReadClientAddressFixture) setupRemoteRequest(remoteAddress, forwarde
 
 func (this *ReadClientAddressFixture) TestPreferTrustedHeaderForIPAddressWhenAvailable() {
 	this.setupRemoteRequest("1.2.3.4", "5.6.7.8")
-	WriteHeader(this.request, "X-Security-Remote-Address", "a.b.c.d")
+	WriteHeader(this.request, "X-Remote-Address", "a.b.c.d")
 
-	this.So(ReadClientIPAddress(this.request, "X-Security-Remote-Address"), should.Equal, "a.b.c.d")
+	this.So(ReadClientIPAddress(this.request, "X-Remote-Address"), should.Equal, "a.b.c.d")
 }
