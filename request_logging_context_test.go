@@ -57,7 +57,7 @@ func (this *LoggingContextFixture) TestRemoteAddressLogged() {
 
 func (this *LoggingContextFixture) TestRemoteAddressFromLoadBalancerOverridesRemoteAddressOnRequest() {
 	this.request.RemoteAddr = "1.2.3.4:5"
-	this.request.Header.Set("X-Security-Remote-Address", "RemoteAddress")
+	this.request.Header.Set(HeaderRemoteAddress, "RemoteAddress")
 	this.createContext()
 	this.So(this.remoteAddress(), should.Equal, `RemoteAddress`)
 }
@@ -105,25 +105,25 @@ func (this *LoggingContextFixture) TestBytesWritten() {
 }
 
 func (this *LoggingContextFixture) TestReferringURL_Present() {
-	this.request.Header.Set("Referer", "the-referer")
+	this.request.Header.Set(HeaderReferer, "the-referer")
 	this.createContext()
 	this.So(this.referringURL(), should.Equal, "the-referer")
 }
 
 func (this *LoggingContextFixture) TestReferringURL_Absent() {
-	this.request.Header.Set("Referer", "")
+	this.request.Header.Set(HeaderReferer, "")
 	this.createContext()
 	this.So(this.referringURL(), should.Equal, "-")
 }
 
 func (this *LoggingContextFixture) TestUserAgent_Present() {
-	this.request.Header.Set("User-Agent", "the-user-agent")
+	this.request.Header.Set(HeaderUserAgent, "the-user-agent")
 	this.createContext()
 	this.So(this.userAgent(), should.Equal, "the-user-agent")
 }
 
 func (this *LoggingContextFixture) TestUserAgent_Absent() {
-	this.request.Header.Set("User-Agent", "")
+	this.request.Header.Set(HeaderUserAgent, "")
 	this.createContext()
 	this.So(this.userAgent(), should.Equal, "-")
 }

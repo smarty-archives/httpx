@@ -38,7 +38,7 @@ func newContext(now time.Time, request *http.Request, response http.ResponseWrit
 		request:     request,
 		originalURL: request.URL.String(),
 		remoteAddress: orDefault(
-			request.Header.Get("X-Security-Remote-Address"),
+			request.Header.Get(HeaderRemoteAddress),
 			host(request.RemoteAddr)),
 	}
 }
