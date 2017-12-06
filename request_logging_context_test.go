@@ -28,11 +28,10 @@ type LoggingContextFixture struct {
 func (this *LoggingContextFixture) Setup() {
 	this.response = httptest.NewRecorder()
 	this.request = httptest.NewRequest("GET", "/", nil)
-	this.request.RemoteAddr = "0.0.0.0:0"
 }
 
 func (this *LoggingContextFixture) createContext() {
-	this.context = newContext(this.now, this.request, this.response)
+	this.context = newContext(this.now, "1.2.3.4", this.request, this.response)
 }
 func (this *LoggingContextFixture) formatContext() []interface{} {
 	return this.context.logFields(this.err)
@@ -50,16 +49,8 @@ func (this *LoggingContextFixture) referringURL() string  { return this.string(7
 func (this *LoggingContextFixture) userAgent() string     { return this.string(8) }
 
 func (this *LoggingContextFixture) TestRemoteAddressLogged() {
-	this.request.RemoteAddr = "1.2.3.4:5"
 	this.createContext()
 	this.So(this.remoteAddress(), should.Equal, `1.2.3.4`)
-}
-
-func (this *LoggingContextFixture) TestRemoteAddressFromLoadBalancerOverridesRemoteAddressOnRequest() {
-	this.request.RemoteAddr = "1.2.3.4:5"
-	this.request.Header.Set(HeaderRemoteAddress, "RemoteAddress")
-	this.createContext()
-	this.So(this.remoteAddress(), should.Equal, `RemoteAddress`)
 }
 
 func (this *LoggingContextFixture) TestStartTimeLogged() {

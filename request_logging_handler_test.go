@@ -33,7 +33,7 @@ func (this *RequestLoggingHandlerFixture) Setup() {
 	this.request = httptest.NewRequest("GET", "/not-status", nil)
 	this.response = httptest.NewRecorder()
 	this.inner = NewFakeHandler()
-	this.handler = NewRequestLoggingHandler(this.inner)
+	this.handler = NewRequestLoggingHandler(this.inner, "X-Remote-Address")
 	this.now = time.Now()
 	this.handler.clock = clock.Freeze(this.now)
 	this.handler.logger = this

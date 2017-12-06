@@ -10,14 +10,21 @@ type RequestLoggingHandler struct {
 	clock  *clock.Clock
 	inner  http.Handler
 	logger logger
+
+	remoteAddressHeader string
 }
 
-func NewRequestLoggingHandler(inner http.Handler) *RequestLoggingHandler {
-	return &RequestLoggingHandler{inner: inner, logger: new(contextLogger)}
+func NewRequestLoggingHandler(inner http.Handler, remoteAddressHeader string) *RequestLoggingHandler {
+	return &RequestLoggingHandler{
+		inner:  inner,
+		logger: new(contextLogger),
+
+		remoteAddressHeader: remoteAddressHeader}
 }
 
 func (this *RequestLoggingHandler) ServeHTTP(response http.ResponseWriter, request *http.Request) {
-	context := newContext(this.clock.UTCNow(), request, response)
+	remoteAddress := ReadClientIPAddress(request, this.remoteAddressHeader)
+	context := newContext(this.clock.UTCNow(), remoteAddress, request, response)
 	defer this.log(context)
 	this.forward(context, request)
 }

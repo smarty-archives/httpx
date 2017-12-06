@@ -1,7 +1,7 @@
 package httpx
 
 const (
-	HeaderRemoteAddress = "X-Security-Remote-Address"
+	HeaderXForwardedFor = "X-Forwarded-For"
 	HeaderUserAgent     = "User-Agent"
 	HeaderReferer       = "Referer"
 )

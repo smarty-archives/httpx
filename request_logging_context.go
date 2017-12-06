@@ -2,7 +2,6 @@ package httpx
 
 import (
 	"fmt"
-	"net"
 	"net/http"
 	"time"
 
@@ -31,22 +30,15 @@ type loggingContext struct {
 	bytesWritten  int
 }
 
-func newContext(now time.Time, request *http.Request, response http.ResponseWriter) *loggingContext {
+func newContext(now time.Time, remoteAddress string, request *http.Request, response http.ResponseWriter) *loggingContext {
 	return &loggingContext{
-		started:     now,
-		response:    response,
-		request:     request,
-		originalURL: request.URL.String(),
-		remoteAddress: orDefault(
-			request.Header.Get(HeaderRemoteAddress),
-			host(request.RemoteAddr)),
+		started:       now,
+		response:      response,
+		request:       request,
+		originalURL:   request.URL.String(),
+		remoteAddress: remoteAddress,
 	}
 }
-func host(address string) string {
-	host, _, _ := net.SplitHostPort(address)
-	return host
-}
-
 func (this *loggingContext) Header() http.Header {
 	return this.response.Header()
 }
