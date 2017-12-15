@@ -39,7 +39,7 @@ func (this *PayloadLimitHandler) handleBody(response http.ResponseWriter, reques
 
 func (this *PayloadLimitHandler) validBody(response http.ResponseWriter, request *http.Request) bool {
 	switch request.Method {
-	case "PUT", "POST", "PATCH":
+	case http.MethodPut, http.MethodPost, http.MethodPatch:
 		return this.bufferedBody(response, request)
 	default:
 		return this.assertEmptyBody(request.Body)

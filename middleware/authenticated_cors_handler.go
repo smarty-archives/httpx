@@ -4,6 +4,8 @@ import (
 	"net"
 	"net/http"
 	"net/url"
+
+	"github.com/smartystreets/httpx"
 )
 
 // Designed to allow cross-domain cookies to be sent by the server and
@@ -17,7 +19,7 @@ type AuthenticatedCORSHandler struct {
 
 func NewAuthenticatedCORSHandler(allowedOrigins ...string) *AuthenticatedCORSHandler {
 	if len(allowedOrigins) == 0 {
-		allowedOrigins = DefaultCORSOrigins
+		allowedOrigins = defaultCORSOrigins
 	}
 	allowed := make(map[string]bool)
 	for _, origin := range allowedOrigins {
@@ -37,8 +39,8 @@ func (this *AuthenticatedCORSHandler) ServeHTTP(response http.ResponseWriter, re
 	headers := response.Header()
 
 	if origin := request.Header.Get("Origin"); this.isAllowed(origin) {
-		headers.Set("Access-Control-Allow-Origin", origin)
-		headers.Set("Access-Control-Allow-Credentials", "true")
+		headers.Set(httpx.HeaderAccessControlAllowOrigin, origin)
+		headers.Set(httpx.HeaderAccessControlAllowCredentials, "true")
 	}
 
 	this.inner.ServeHTTP(response, request)
@@ -61,7 +63,7 @@ func extractHostname(origin string) string {
 	}
 }
 
-var DefaultCORSOrigins = []string{
+var defaultCORSOrigins = []string{
 	"localhost",
 	"smartystreets.dev",
 	"smartystreets.com",

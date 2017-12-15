@@ -24,9 +24,9 @@ func (this *ContentTypeOverrideHandler) Install(handler http.Handler) {
 }
 
 func (this *ContentTypeOverrideHandler) ServeHTTP(response http.ResponseWriter, request *http.Request) {
-	contentType := httpx.ReadHeader(request, "Content-Type")
-	if strings.Contains(contentType, "application/x-www-form-urlencoded") {
-		httpx.WriteHeader(request, "Content-Type", this.override)
+	contentType := httpx.ReadHeader(request, httpx.HeaderContentType)
+	if strings.Contains(contentType, httpx.ContentTypeFormURLEncoded) {
+		httpx.WriteHeader(request, httpx.HeaderContentType, this.override)
 	}
 
 	this.inner.ServeHTTP(response, request)

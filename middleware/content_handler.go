@@ -3,6 +3,8 @@ package middleware
 import (
 	"net/http"
 	"strings"
+
+	"github.com/smartystreets/httpx"
 )
 
 type ContentHandler struct {
@@ -15,13 +17,13 @@ func NewContentStringHandler(payload, contentType string) *ContentHandler {
 }
 func NewContentHandler(payload []byte, contentType string) *ContentHandler {
 	if strings.TrimSpace(contentType) == "" {
-		contentType = "application/octet-stream"
+		contentType = httpx.ContentTypeOctetStream
 	}
 
 	return &ContentHandler{payload: payload, contentType: contentType}
 }
 
 func (this *ContentHandler) ServeHTTP(response http.ResponseWriter, request *http.Request) {
-	response.Header()["Content-Type"] = []string{this.contentType}
+	response.Header()[httpx.HeaderContentType] = []string{this.contentType}
 	response.Write(this.payload)
 }

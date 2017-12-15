@@ -1,6 +1,10 @@
 package middleware
 
-import "net/http"
+import (
+	"net/http"
+
+	"github.com/smartystreets/httpx"
+)
 
 type FileHandler struct {
 	filename    string
@@ -13,7 +17,7 @@ func NewFileHandler(fullPathToFile, contentType string) *NestableHandler {
 
 func (this *FileHandler) ServeHTTP(response http.ResponseWriter, request *http.Request) {
 	if len(this.contentType) > 0 {
-		response.Header().Set("Content-Type", this.contentType)
+		response.Header().Set(httpx.HeaderContentType, this.contentType)
 	}
 
 	http.ServeFile(response, request, this.filename)

@@ -17,11 +17,11 @@ func DefaultCORSHeadersHandler() *HeadersHandler {
 }
 func OriginCORSHeadersHandler(origin string) *HeadersHandler {
 	return CORSHeadersHandler(map[string]string{
-		"Access-Control-Allow-Origin":      origin,
-		"Access-Control-Allow-Methods":     "GET, PUT, POST, DELETE, HEAD",
-		"Access-Control-Allow-Headers":     "Accept, Content-Type, Content-Length, Referer, Origin, Host",
-		"Access-Control-Allow-Credentials": "true",
-		"Access-Control-Max-Age":           "600",
+		httpx.HeaderAccessControlAllowOrigin:      origin,
+		httpx.HeaderAccessControlAllowMethods:     httpx.DefaultCORSMethods,
+		httpx.HeaderAccessControlAllowHeaders:     httpx.DefaultCORSHeaders,
+		httpx.HeaderAccessControlAllowCredentials: "true",
+		httpx.HeaderAccessControlMaxAgeSeconds:    "600",
 	})
 }
 
@@ -55,8 +55,8 @@ func (this *HeadersHandler) ServeHTTP(response http.ResponseWriter, request *htt
 
 func (this *HeadersHandler) canWriteHeaders(request *http.Request) bool {
 	return this.alwaysWrite ||
-		len(httpx.ReadHeader(request, "Origin")) > 0 ||
-		len(httpx.ReadHeader(request, "Referer")) > 0
+		len(httpx.ReadHeader(request, httpx.HeaderOrigin)) > 0 ||
+		len(httpx.ReadHeader(request, httpx.HeaderReferer)) > 0
 }
 
 func (this *HeadersHandler) writeHeaders(response http.ResponseWriter) {
