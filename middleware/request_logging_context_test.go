@@ -1,4 +1,4 @@
-package httpx
+package middleware
 
 import (
 	"fmt"
@@ -9,6 +9,7 @@ import (
 
 	"github.com/smartystreets/assertions/should"
 	"github.com/smartystreets/gunit"
+	"github.com/smartystreets/httpx"
 )
 
 func TestLoggingContextFixture(t *testing.T) {
@@ -96,25 +97,25 @@ func (this *LoggingContextFixture) TestBytesWritten() {
 }
 
 func (this *LoggingContextFixture) TestReferringURL_Present() {
-	this.request.Header.Set(HeaderReferer, "the-referer")
+	this.request.Header.Set(httpx.HeaderReferer, "the-referer")
 	this.createContext()
 	this.So(this.referringURL(), should.Equal, "the-referer")
 }
 
 func (this *LoggingContextFixture) TestReferringURL_Absent() {
-	this.request.Header.Set(HeaderReferer, "")
+	this.request.Header.Set(httpx.HeaderReferer, "")
 	this.createContext()
 	this.So(this.referringURL(), should.Equal, "-")
 }
 
 func (this *LoggingContextFixture) TestUserAgent_Present() {
-	this.request.Header.Set(HeaderUserAgent, "the-user-agent")
+	this.request.Header.Set(httpx.HeaderUserAgent, "the-user-agent")
 	this.createContext()
 	this.So(this.userAgent(), should.Equal, "the-user-agent")
 }
 
 func (this *LoggingContextFixture) TestUserAgent_Absent() {
-	this.request.Header.Set(HeaderUserAgent, "")
+	this.request.Header.Set(httpx.HeaderUserAgent, "")
 	this.createContext()
 	this.So(this.userAgent(), should.Equal, "-")
 }

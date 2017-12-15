@@ -1,9 +1,10 @@
-package httpx
+package middleware
 
 import (
 	"net/http"
 
 	"github.com/smartystreets/clock"
+	"github.com/smartystreets/httpx"
 )
 
 type RequestLoggingHandler struct {
@@ -23,7 +24,7 @@ func NewRequestLoggingHandler(inner http.Handler, remoteAddressHeader string) *R
 }
 
 func (this *RequestLoggingHandler) ServeHTTP(response http.ResponseWriter, request *http.Request) {
-	remoteAddress := ReadClientIPAddress(request, this.remoteAddressHeader)
+	remoteAddress := httpx.ReadClientIPAddress(request, this.remoteAddressHeader)
 	context := newContext(this.clock.UTCNow(), remoteAddress, request, response)
 	defer this.log(context)
 	this.forward(context, request)
