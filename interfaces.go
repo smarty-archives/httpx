@@ -12,6 +12,6 @@ type Sender interface {
 	Send(interface{}) interface{}
 }
 
-type HTTPClient interface {
+type Client interface {
 	Do(*http.Request) (*http.Response, error)
 }
