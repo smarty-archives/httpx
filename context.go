@@ -24,7 +24,11 @@ func InitializeContext(request *http.Request) *http.Request {
 }
 
 func Context(request ContextualRequest) Namespace {
-	return request.Context().Value(contextNamespace).(Namespace)
+	namespace, ok := request.Context().Value(contextNamespace).(Namespace)
+	if !ok {
+		namespace = make(Namespace)
+	}
+	return namespace
 }
 
 type Namespace map[interface{}]interface{}
