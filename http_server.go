@@ -1,6 +1,7 @@
 package httpx
 
 import (
+	"context"
 	"crypto/tls"
 	"log"
 	"net/http"
@@ -10,10 +11,9 @@ import (
 )
 
 type HTTPServer struct {
-	logger *logging.Logger
-
+	logger         *logging.Logger
 	certificatePEM string
-	inner          http.Server
+	inner          *http.Server
 }
 
 func NewHTTPServer(listenAddress string, handler http.Handler) *HTTPServer {
@@ -23,7 +23,7 @@ func NewHTTPServer(listenAddress string, handler http.Handler) *HTTPServer {
 	}
 
 	return &HTTPServer{
-		inner: http.Server{
+		inner: &http.Server{
 			Addr:           listenAddress,
 			Handler:        handler,
 			ReadTimeout:    time.Second * 15,
@@ -61,7 +61,11 @@ func (this *HTTPServer) Listen() {
 	}
 
 	this.logger.Printf("[INFO] Listening for web traffic on %s.\n", this.inner.Addr)
-	if err := this.listen(); err != nil {
+	if err := this.listen(); err == nil {
+		return
+	} else if err == http.ErrServerClosed {
+		this.logger.Fatal("[INFO] Server shut down gracefully.")
+	} else {
 		this.logger.Fatal("[ERROR] Unable to listen to web traffic: ", err)
 	}
 }
@@ -72,3 +76,14 @@ func (this *HTTPServer) listen() error {
 
 	return this.inner.ListenAndServeTLS(this.certificatePEM, this.certificatePEM)
 }
+
+func (this *HTTPServer) Shutdown(timeout time.Duration) error {
+	ctx, _ := context.WithTimeout(context.Background(), timeout)
+	return this.inner.Shutdown(ctx)
+}
+
+func (this *HTTPServer) Close() error {
+	return this.Shutdown(DefaultShutdownTimeout)
+}
+
+var DefaultShutdownTimeout = time.Second
