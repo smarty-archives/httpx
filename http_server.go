@@ -82,8 +82,8 @@ func (this *HTTPServer) Shutdown(timeout time.Duration) error {
 	return this.inner.Shutdown(ctx)
 }
 
-func (this *HTTPServer) Close() error {
-	return this.Shutdown(DefaultShutdownTimeout)
+func (this *HTTPServer) Close() {
+	this.Shutdown(DefaultShutdownTimeout)
 }
 
 var DefaultShutdownTimeout = time.Second
