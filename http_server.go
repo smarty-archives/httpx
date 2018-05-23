@@ -5,6 +5,7 @@ import (
 	"crypto/tls"
 	"log"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/smartystreets/logging"
@@ -50,7 +51,15 @@ func (this *HTTPServer) WithTLS(certificatePEM string, tlsConfig *tls.Config) *H
 		}
 	}
 
-	this.certificatePEM = certificatePEM
+	if strings.Contains(certificatePEM, "----BEGIN") {
+		if cert, err := tls.X509KeyPair([]byte(certificatePEM), []byte(certificatePEM)); err == nil {
+			tlsConfig.Certificates = append(tlsConfig.Certificates, cert)
+		} else {
+			this.logger.Fatal("[ERROR] Unable to parse TLS certificate data: ", err)
+		}
+	} else {
+		this.certificatePEM = certificatePEM
+	}
 	this.inner.TLSConfig = tlsConfig
 	return this
 }
@@ -70,7 +79,7 @@ func (this *HTTPServer) Listen() {
 	}
 }
 func (this *HTTPServer) listen() error {
-	if len(this.certificatePEM) == 0 {
+	if len(this.certificatePEM) == 0 && (this.inner.TLSConfig == nil || len(this.inner.TLSConfig.Certificates) == 0) {
 		return this.inner.ListenAndServe()
 	}
 
