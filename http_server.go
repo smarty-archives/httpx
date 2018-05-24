@@ -69,13 +69,13 @@ func (this *HTTPServer) Listen() {
 		return
 	}
 
-	this.logger.Printf("[INFO] Listening for web traffic on %s.\n", this.inner.Addr)
+	this.logger.Printf("[INFO] Listening for HTTP traffic on %s.\n", this.inner.Addr)
 	if err := this.listen(); err == nil {
 		return
 	} else if err == http.ErrServerClosed {
-		this.logger.Fatal("[INFO] Server shut down gracefully.")
+		this.logger.Fatal("[INFO] HTTP listener shut down gracefully.")
 	} else {
-		this.logger.Fatal("[ERROR] Unable to listen to web traffic: ", err)
+		this.logger.Fatal("[ERROR] Unable to listen to HTTP traffic: ", err)
 	}
 }
 func (this *HTTPServer) listen() error {
