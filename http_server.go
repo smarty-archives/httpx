@@ -73,7 +73,7 @@ func (this *HTTPServer) Listen() {
 	if err := this.listen(); err == nil {
 		return
 	} else if err == http.ErrServerClosed {
-		this.logger.Fatal("[INFO] HTTP listener shut down gracefully.")
+		this.logger.Println("[INFO] HTTP listener shut down gracefully.")
 	} else {
 		this.logger.Fatal("[ERROR] Unable to listen to HTTP traffic: ", err)
 	}
