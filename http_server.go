@@ -87,6 +87,10 @@ func (this *HTTPServer) listen() error {
 }
 
 func (this *HTTPServer) Shutdown(timeout time.Duration) error {
+	if this == nil {
+		return nil
+	}
+
 	ctx, _ := context.WithTimeout(context.Background(), timeout)
 	return this.inner.Shutdown(ctx)
 }
