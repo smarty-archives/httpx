@@ -51,11 +51,10 @@ func remoteAddressFromTCP(raw string) string {
 	return value
 }
 
-func CalculateRequestSize(request *http.Request) int {
-	return calculatePreambleSize(request) +
-		calculateHeaderSize(request) +
-		calculateBodySize(request) +
-		1 // off by one
+func CalculateRequestSize(request *http.Request) int64 {
+	return int64(calculatePreambleSize(request)) +
+		int64(calculateHeaderSize(request)) +
+		request.ContentLength + 1
 }
 func calculatePreambleSize(request *http.Request) (size int) {
 	size += len(request.Method)
@@ -88,9 +87,6 @@ func calculateHeaderLineSize(key, value string) (size int) {
 	size += 2 // colon and space characters
 	size += len(value)
 	return size + httpLineBreakLength
-}
-func calculateBodySize(request *http.Request) int {
-	return int(request.ContentLength)
 }
 
 const httpLineBreakLength = 2
