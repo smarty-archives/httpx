@@ -3,6 +3,7 @@ package httpx
 import (
 	"net"
 	"net/http"
+	"net/url"
 	"strings"
 	"sync"
 )
@@ -49,3 +50,47 @@ func remoteAddressFromTCP(raw string) string {
 	value, _, _ := net.SplitHostPort(raw)
 	return value
 }
+
+func CalculateRequestSize(request *http.Request) int {
+	return calculatePreambleSize(request) +
+		calculateHeaderSize(request) +
+		calculateBodySize(request) +
+		1 // off by one
+}
+func calculatePreambleSize(request *http.Request) (size int) {
+	size += len(request.Method)
+	size += 1 // space
+	size += calculateURLSize(request.URL)
+	size += 1 // space
+	size += len(request.Proto)
+	return size + httpLineBreakLength
+}
+func calculateURLSize(value *url.URL) int {
+	pathSize := len(value.Path)
+
+	if querySize := len(value.RawQuery); querySize > 0 {
+		return pathSize + querySize
+	} else {
+		return pathSize
+	}
+}
+func calculateHeaderSize(request *http.Request) (size int) {
+	for key, values := range request.Header {
+		for _, value := range values {
+			size += calculateHeaderLineSize(key, value)
+		}
+	}
+
+	return size + httpLineBreakLength
+}
+func calculateHeaderLineSize(key, value string) (size int) {
+	size += len(key)
+	size += 2 // colon and space characters
+	size += len(value)
+	return size + httpLineBreakLength
+}
+func calculateBodySize(request *http.Request) int {
+	return int(request.ContentLength)
+}
+
+const httpLineBreakLength = 2

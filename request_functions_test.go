@@ -1,8 +1,11 @@
 package httpx
 
 import (
+	"bytes"
+	"io"
 	"net/http"
 	"net/http/httptest"
+	"net/http/httputil"
 	"testing"
 
 	"github.com/smartystreets/assertions/should"
@@ -41,4 +44,29 @@ func (this *ReadClientAddressFixture) TestPreferTrustedHeaderForIPAddressWhenAva
 	WriteHeader(this.request, "X-Remote-Address", "a.b.c.d")
 
 	this.So(ReadClientIPAddress(this.request, "X-Remote-Address"), should.Equal, "a.b.c.d")
+}
+
+/////////////////////////////////////////////////////////////
+
+func TestRequestFixture(t *testing.T) {
+	gunit.Run(new(RequestFixture), t)
+}
+
+type RequestFixture struct {
+	*gunit.Fixture
+}
+
+func (this *RequestFixture) TestCalculateRequestBodySize() {
+	buffer := bytes.NewBuffer([]byte{})
+	io.WriteString(buffer, "Line 1\n")
+	io.WriteString(buffer, "Line 2\n")
+	io.WriteString(buffer, "Line 3")
+
+	request, _ := http.NewRequest("POST", "https://user:pass@domain.com:1234/path/doc?query=value", buffer)
+	request.Header["Host"] = []string{"domain.com:1234"}
+	request.Header["User-Agent"] = []string{"my user agent"}
+	request.Header["Content-Type"] = []string{"application/json", "application/xml"}
+
+	raw, _ := httputil.DumpRequest(request, true)
+	this.So(CalculateRequestSize(request), should.Equal, len(raw))
 }
