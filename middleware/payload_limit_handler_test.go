@@ -125,18 +125,6 @@ func (this *PayloadLimitHandlerFixture) assertBodyMethodsAllowedThrough(method s
 	this.assertRequestAccepted()
 }
 
-func (this *PayloadLimitHandlerFixture) TestFormAndQueryStringIsParsed() {
-	for method := range httpMethods {
-		this.assertFormIsParsed(method, "/?a=1", "a", "1")
-	}
-}
-func (this *PayloadLimitHandlerFixture) assertFormIsParsed(method, query, key, value string) {
-	this.Setup()
-	this.request, _ = http.NewRequest(method, query, this.bodyBuffer)
-	this.handler.ServeHTTP(this.response, this.request)
-	this.So(this.request.Form.Get(key), should.Equal, value)
-}
-
 type ReadCloser struct {
 	reader io.Reader
 	closed int

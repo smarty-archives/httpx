@@ -23,7 +23,6 @@ func (this *PayloadLimitHandler) Install(inner http.Handler) {
 
 func (this *PayloadLimitHandler) ServeHTTP(response http.ResponseWriter, request *http.Request) {
 	if this.handleBody(response, request) {
-		request.ParseForm()
 		this.inner.ServeHTTP(response, request)
 	} else {
 		httpx.WriteResult(response, http.StatusRequestEntityTooLarge)
@@ -49,7 +48,7 @@ func (this *PayloadLimitHandler) bufferedBody(response http.ResponseWriter, requ
 	if payload, err := ioutil.ReadAll(http.MaxBytesReader(response, request.Body, int64(this.maxSize))); err != nil {
 		return false
 	} else if len(payload) > 0 {
-		request.Body = ioutil.NopCloser(bytes.NewBuffer(payload))
+		request.Body = ioutil.NopCloser(bytes.NewReader(payload))
 	}
 
 	return true
