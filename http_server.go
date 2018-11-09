@@ -14,6 +14,7 @@ import (
 type HTTPServer struct {
 	logger         *logging.Logger
 	certificatePEM string
+	keyPEM         string
 	inner          *http.Server
 }
 
@@ -33,24 +34,23 @@ func NewHTTPServer(listenAddress string, handler http.Handler) *HTTPServer {
 		},
 	}
 }
+
+func (this *HTTPServer) WithTLSFiles(cert, key string, tlsConfig *tls.Config) *HTTPServer {
+	if this == nil {
+		return nil
+	}
+
+	tlsConfig = defaultTLSConfig(tlsConfig)
+	this.certificatePEM = cert
+	this.keyPEM = key
+	return this
+}
 func (this *HTTPServer) WithTLS(certificatePEM string, tlsConfig *tls.Config) *HTTPServer {
 	if this == nil {
 		return nil
 	}
 
-	if tlsConfig == nil {
-		tlsConfig = &tls.Config{
-			MinVersion:               tls.VersionTLS12,
-			PreferServerCipherSuites: true,
-			SessionTicketsDisabled:   true,
-			CipherSuites: []uint16{
-				tls.TLS_FALLBACK_SCSV,
-				tls.TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,
-				tls.TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,
-			},
-		}
-	}
-
+	tlsConfig = defaultTLSConfig(tlsConfig)
 	if strings.Contains(certificatePEM, "----BEGIN") {
 		if cert, err := tls.X509KeyPair([]byte(certificatePEM), []byte(certificatePEM)); err == nil {
 			tlsConfig.Certificates = append(tlsConfig.Certificates, cert)
@@ -62,6 +62,22 @@ func (this *HTTPServer) WithTLS(certificatePEM string, tlsConfig *tls.Config) *H
 	}
 	this.inner.TLSConfig = tlsConfig
 	return this
+}
+func defaultTLSConfig(config *tls.Config) *tls.Config {
+	if config != nil {
+		return config
+	}
+
+	return &tls.Config{
+		MinVersion:               tls.VersionTLS12,
+		PreferServerCipherSuites: true,
+		SessionTicketsDisabled:   true,
+		CipherSuites: []uint16{
+			tls.TLS_FALLBACK_SCSV,
+			tls.TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,
+			tls.TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,
+		},
+	}
 }
 
 func (this *HTTPServer) Listen() {
@@ -83,7 +99,14 @@ func (this *HTTPServer) listen() error {
 		return this.inner.ListenAndServe()
 	}
 
-	return this.inner.ListenAndServeTLS(this.certificatePEM, this.certificatePEM)
+	return this.inner.ListenAndServeTLS(this.certificatePEM, this.privateKeyPEM())
+}
+func (this *HTTPServer) privateKeyPEM() string {
+	if len(this.keyPEM) == 0 {
+		return this.certificatePEM
+	} else {
+		return this.keyPEM
+	}
 }
 
 func (this *HTTPServer) Shutdown(timeout time.Duration) error {
