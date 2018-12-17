@@ -68,4 +68,5 @@ var defaultCORSOrigins = []string{
 	"smartystreets.dev",
 	"smartystreets.com",
 	"storefront.smartystreets.com",
+	"account.smartystreets.com",
 }
