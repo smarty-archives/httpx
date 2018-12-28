@@ -14,21 +14,25 @@ import (
 // registered for that route.
 type AuthenticatedCORSHandler struct {
 	inner          http.Handler
-	allowedOrigins map[string]bool
+	allowedOrigins map[string]struct{}
 }
 
 func NewAuthenticatedCORSHandler(allowedOrigins ...string) *AuthenticatedCORSHandler {
 	if len(allowedOrigins) == 0 {
 		allowedOrigins = defaultCORSOrigins
 	}
-	allowed := make(map[string]bool)
-	for _, origin := range allowedOrigins {
-		allowed[origin] = true
+
+	allowed := make(map[string]struct{})
+	this := &AuthenticatedCORSHandler{inner: NoopHandler{}, allowedOrigins: allowed}
+	return this.AppendAllowedOrigin(allowedOrigins...)
+}
+
+func (this *AuthenticatedCORSHandler) AppendAllowedOrigin(allowedOrigins ...string) *AuthenticatedCORSHandler {
+	for _, value := range allowedOrigins {
+		this.allowedOrigins[value] = struct{}{}
 	}
-	return &AuthenticatedCORSHandler{
-		inner:          NoopHandler{},
-		allowedOrigins: allowed,
-	}
+
+	return this
 }
 
 func (this *AuthenticatedCORSHandler) Install(handler http.Handler) {
@@ -47,7 +51,8 @@ func (this *AuthenticatedCORSHandler) ServeHTTP(response http.ResponseWriter, re
 }
 
 func (this *AuthenticatedCORSHandler) isAllowed(origin string) bool {
-	return this.allowedOrigins[extractHostname(origin)]
+	_, contains := this.allowedOrigins[extractHostname(origin)]
+	return contains
 }
 
 func extractHostname(origin string) string {
@@ -63,10 +68,4 @@ func extractHostname(origin string) string {
 	}
 }
 
-var defaultCORSOrigins = []string{
-	"localhost",
-	"smartystreets.dev",
-	"smartystreets.com",
-	"storefront.smartystreets.com",
-	"account.smartystreets.com",
-}
+var defaultCORSOrigins = []string{"localhost", "smartystreets.dev", "smartystreets.com"}
