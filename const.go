@@ -21,6 +21,7 @@ const (
 	HeaderAccessControlMaxAgeSeconds    = "Access-Control-Max-Age"
 
 	HeaderXForwardedFor = "X-Forwarded-For"
+	HeaderVia           = "Via"
 )
 
 var (

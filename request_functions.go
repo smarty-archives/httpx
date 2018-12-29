@@ -27,24 +27,39 @@ func WriteHeader(request *http.Request, canonicalHeaderName string, value string
 }
 
 func ReadClientIPAddress(request *http.Request, customHeader string) string {
-	if len(customHeader) > 0 {
-		if remoteAddress := ReadHeader(request, customHeader); len(remoteAddress) > 0 {
-			return remoteAddressFromHeader(remoteAddress)
-		}
+	if address, found := readCustomHeader(ReadHeader(request, customHeader)); found {
+		return address
+	} else if address, found = readViaForwardedFor(request); found {
+		return address
+	} else if address, found = readForwardedFor(request, 0); found {
+		return address
+	} else {
+		return remoteAddressFromTCP(request.RemoteAddr)
 	}
-
-	if forwardedAddress := ReadHeader(request, HeaderXForwardedFor); len(forwardedAddress) > 0 {
-		return remoteAddressFromHeader(forwardedAddress)
-	}
-
-	return remoteAddressFromTCP(request.RemoteAddr)
 }
-func remoteAddressFromHeader(value string) string {
-	if index := strings.LastIndex(value, ", "); index >= 0 {
-		return value[index+2:]
+func readViaForwardedFor(request *http.Request) (string, bool) {
+	if via := ReadHeader(request, HeaderVia); len(via) == 0 {
+		return "", false
 	}
 
-	return value
+	return readForwardedFor(request, 1)
+}
+func readCustomHeader(value string) (string, bool) {
+	return value, len(value) > 0
+}
+func readForwardedFor(request *http.Request, depth int) (string, bool) {
+	forwardedFor := ReadHeader(request, HeaderXForwardedFor)
+	address := remoteAddressFromHeader(forwardedFor, depth)
+	return address, len(address) > 0
+}
+func remoteAddressFromHeader(value string, depth int) string {
+	if index := strings.LastIndex(value, ", "); index < 0 {
+		return value // not found
+	} else if depth == 0 {
+		return value[index+2:] // last iteration, return it
+	} else {
+		return remoteAddressFromHeader(value[0:index], depth-1) // remove from the end
+	}
 }
 func remoteAddressFromTCP(raw string) string {
 	value, _, _ := net.SplitHostPort(raw)

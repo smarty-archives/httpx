@@ -46,6 +46,23 @@ func (this *ReadClientAddressFixture) TestPreferTrustedHeaderForIPAddressWhenAva
 	this.So(ReadClientIPAddress(this.request, "X-Remote-Address"), should.Equal, "a.b.c.d")
 }
 
+func (this *ReadClientAddressFixture) TestReadCorrectSourceAddressWithViaHeader() {
+	this.request = httptest.NewRequest("GET", "/", nil)
+	this.request.RemoteAddr = "2.2.2.2:1234"
+
+	WriteHeader(this.request, "Via", "some value")
+	WriteHeader(this.request, HeaderXForwardedFor, "0.0.0.0, 1.1.1.1, 2.2.2.2")
+
+	this.So(ReadClientIPAddress(this.request, "X-Remote-Address"), should.Equal, "1.1.1.1")
+}
+func (this *ReadClientAddressFixture) TestReadCorrectSourceAddress() {
+	this.request = httptest.NewRequest("GET", "/", nil)
+	this.request.RemoteAddr = "1.1.1.1:1234"
+	WriteHeader(this.request, "Via", "some value")
+
+	this.So(ReadClientIPAddress(this.request, "X-Remote-Address"), should.Equal, "1.1.1.1")
+}
+
 /////////////////////////////////////////////////////////////
 
 func TestRequestFixture(t *testing.T) {
