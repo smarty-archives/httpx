@@ -5,14 +5,7 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
-	"sync"
 )
-
-func NewWaitGroup(workers int) *sync.WaitGroup {
-	waiter := &sync.WaitGroup{}
-	waiter.Add(workers)
-	return waiter
-}
 
 func ReadHeader(request *http.Request, canonicalHeaderName string) string {
 	if values, contains := request.Header[canonicalHeaderName]; contains && len(values) > 0 {
