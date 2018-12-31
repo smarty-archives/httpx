@@ -37,15 +37,15 @@ func ReadClientIPAddress(request *http.Request, customHeader string) string {
 		return remoteAddressFromTCP(request.RemoteAddr)
 	}
 }
+func readCustomHeader(value string) (string, bool) {
+	return value, len(value) > 0
+}
 func readViaForwardedFor(request *http.Request) (string, bool) {
 	if via := ReadHeader(request, HeaderVia); len(via) == 0 {
 		return "", false
 	}
 
 	return readForwardedFor(request, 1)
-}
-func readCustomHeader(value string) (string, bool) {
-	return value, len(value) > 0
 }
 func readForwardedFor(request *http.Request, depth int) (string, bool) {
 	forwardedFor := ReadHeader(request, HeaderXForwardedFor)
