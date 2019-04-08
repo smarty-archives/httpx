@@ -30,7 +30,7 @@ func NewHTTPServer(listenAddress string, handler http.Handler) *HTTPServer {
 			Handler:        handler,
 			ReadTimeout:    time.Second * 15,
 			WriteTimeout:   time.Second * 15,
-			MaxHeaderBytes: 1024 * 2,
+			MaxHeaderBytes: 1024 * 64,
 		},
 	}
 }
