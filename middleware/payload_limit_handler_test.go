@@ -36,9 +36,9 @@ func (this *PayloadLimitHandlerFixture) Setup() {
 	this.handler = NewPayloadLimitHandler(this.maxSize)
 	this.handler.Install(this.inner)
 
-	this.bodyBuffer = bytes.NewBuffer([]byte{})
+	this.bodyBuffer = new(bytes.Buffer)
 	this.requestBody = NewReadCloser(this.bodyBuffer)
-	this.request, _ = http.NewRequest("PUT", "/", this.requestBody)
+	this.request = httptest.NewRequest("PUT", "/", this.requestBody)
 	this.response = httptest.NewRecorder()
 }
 
@@ -53,11 +53,11 @@ func (this *PayloadLimitHandlerFixture) assertRequestRejected() {
 	this.So(this.response.Code, should.Equal, http.StatusRequestEntityTooLarge)
 	this.So(strings.TrimSpace(this.response.Body.String()), should.Equal, "Request Entity Too Large")
 	this.So(this.inner.calls, should.Equal, 0)
-	this.So(this.requestBody.closed, should.Equal, 1)
+	this.So(this.requestBody.closed, should.Equal, 0)
 }
 
 func (this *PayloadLimitHandlerFixture) TestSmallRequestsAreAccepted() {
-	expectedContents := strings.Repeat(".", int(this.maxSize-1))
+	expectedContents := strings.Repeat(".", int(this.maxSize))
 	this.bodyBuffer.WriteString(expectedContents)
 
 	this.handler.ServeHTTP(this.response, this.request)
@@ -71,11 +71,15 @@ func (this *PayloadLimitHandlerFixture) assertRequestAccepted() {
 	this.So(this.inner.calls, should.Equal, 1)
 	this.So(this.inner.request, should.Equal, this.request)
 	this.So(this.inner.response, should.Equal, this.response)
-	this.So(this.requestBody.closed, should.Equal, 1)
+	if methodAllowsBody[this.request.Method] {
+		this.So(this.requestBody.closed, should.Equal, 1)
+	} else {
+		this.So(this.requestBody.closed, should.Equal, 0)
+	}
 }
 
 func (this *PayloadLimitHandlerFixture) TestBodylessMethodsWithBodyRejected() {
-	for method, containsBody := range httpMethods {
+	for method, containsBody := range methodAllowsBody {
 		if !containsBody {
 			this.assertBodylessMethodWithBodyRejected(method)
 		}
@@ -92,7 +96,7 @@ func (this *PayloadLimitHandlerFixture) assertBodylessMethodWithBodyRejected(met
 }
 
 func (this *PayloadLimitHandlerFixture) TestBodylessMethodsBodyUnmodified() {
-	for method, containsBody := range httpMethods {
+	for method, containsBody := range methodAllowsBody {
 		if !containsBody {
 			this.assertBodylessMethodsBodyUnmodified(method)
 		}
@@ -109,7 +113,7 @@ func (this *PayloadLimitHandlerFixture) assertBodylessMethodsBodyUnmodified(meth
 }
 
 func (this *PayloadLimitHandlerFixture) TestMethodsAllowedBodyCanContainBody() {
-	for method, containsBody := range httpMethods {
+	for method, containsBody := range methodAllowsBody {
 		if containsBody {
 			this.assertBodyMethodsAllowedThrough(method)
 		}
@@ -118,7 +122,7 @@ func (this *PayloadLimitHandlerFixture) TestMethodsAllowedBodyCanContainBody() {
 func (this *PayloadLimitHandlerFixture) assertBodyMethodsAllowedThrough(method string) {
 	this.Setup()
 	this.request.Method = method
-	this.bodyBuffer.WriteString(strings.Repeat(".", int(this.maxSize-1)))
+	this.bodyBuffer.WriteString(strings.Repeat(".", int(this.maxSize)))
 
 	this.handler.ServeHTTP(this.response, this.request)
 
@@ -133,15 +137,3 @@ type ReadCloser struct {
 func NewReadCloser(reader io.Reader) *ReadCloser         { return &ReadCloser{reader: reader} }
 func (this *ReadCloser) Read(buffer []byte) (int, error) { return this.reader.Read(buffer) }
 func (this *ReadCloser) Close() error                    { this.closed++; return nil }
-
-var httpMethods = map[string]bool{
-	"GET":     false,
-	"HEAD":    false,
-	"OPTIONS": false,
-	"PUT":     true, // has a body
-	"POST":    true, // has a body
-	"PATCH":   true, // body is allowed
-	"DELETE":  false,
-	"TRACE":   false,
-	"DEBUG":   false,
-}
