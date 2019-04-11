@@ -49,13 +49,12 @@ func (this *PayloadLimitHandler) handleDisallowedBody(response http.ResponseWrit
 		this.inner.ServeHTTP(response, request)
 	}
 }
-
-var discardBuffer = make([]byte, 4) // writes to buffer are not thread safe but value is never read
-
 func (this *PayloadLimitHandler) bodyIsEmpty(body io.ReadCloser) bool {
 	read, _ := body.Read(discardBuffer)
 	return read == 0
 }
+
+var discardBuffer = make([]byte, 4) // writes to buffer are not thread safe but value is never read
 
 var methodAllowsBody = map[string]bool{
 	"PUT":   true, // has a body
