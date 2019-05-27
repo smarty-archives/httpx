@@ -22,8 +22,6 @@ func WriteHeader(request *http.Request, canonicalHeaderName string, value string
 func ReadClientIPAddress(request *http.Request, customHeader string) string {
 	if address, found := readCustomHeader(ReadHeader(request, customHeader)); found {
 		return address
-	} else if address, found = readViaForwardedFor(request); found {
-		return address
 	} else if address, found = readForwardedFor(request, 0); found {
 		return address
 	} else {
@@ -32,13 +30,6 @@ func ReadClientIPAddress(request *http.Request, customHeader string) string {
 }
 func readCustomHeader(value string) (string, bool) {
 	return value, len(value) > 0
-}
-func readViaForwardedFor(request *http.Request) (string, bool) {
-	if via := ReadHeader(request, HeaderVia); len(via) == 0 {
-		return "", false
-	}
-
-	return readForwardedFor(request, 1)
 }
 func readForwardedFor(request *http.Request, depth int) (string, bool) {
 	forwardedFor := ReadHeader(request, HeaderXForwardedFor)
