@@ -3,6 +3,7 @@ package middleware
 import (
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 
 	"github.com/smartystreets/assertions/should"
@@ -49,4 +50,24 @@ func (this *ContentHandlerFixture) TestStringResponseHasCorrectContent() {
 
 	this.So(this.response.Body.String(), should.Equal, "Hello, World!")
 	this.So(this.response.Header().Get("Content-Type"), should.Equal, "text/plain")
+}
+
+func (this *ContentHandlerFixture) TestOddNumberOfInputs_PANIC() {
+	this.So(func() { NewKeyValueContentHandler("odd", "number", "of", "version", "inputs") }, should.Panic)
+}
+
+func (this *ContentHandlerFixture) TestNoInputs_NoOutput() {
+	controller := NewKeyValueContentHandler()
+	controller.ServeHTTP(this.response, nil)
+	this.So(this.response.Code, should.Equal, http.StatusOK)
+	this.So(this.response.Header().Get("Content-Type"), should.Equal, "text/plain; charset=utf-8")
+	this.So(this.response.Body.String(), should.Equal, strings.TrimSpace(keyValueContentSyntax)+"\n\n")
+}
+
+func (this *ContentHandlerFixture) TestInputsRenderedToOutput() {
+	controller := NewKeyValueContentHandler("pkg1", "1.2.3", "pkg2", "3.2.1")
+	controller.ServeHTTP(this.response, nil)
+	this.So(this.response.Code, should.Equal, http.StatusOK)
+	this.So(this.response.Header().Get("Content-Type"), should.Equal, "text/plain; charset=utf-8")
+	this.So(this.response.Body.String(), should.Equal, keyValueContentSyntax+"pkg1=1.2.3\npkg2=3.2.1\n")
 }
