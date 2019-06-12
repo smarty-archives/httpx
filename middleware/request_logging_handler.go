@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/smartystreets/clock"
+
 	"github.com/smartystreets/httpx"
 )
 

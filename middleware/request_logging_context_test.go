@@ -9,6 +9,7 @@ import (
 
 	"github.com/smartystreets/assertions/should"
 	"github.com/smartystreets/gunit"
+
 	"github.com/smartystreets/httpx"
 )
 
