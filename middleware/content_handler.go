@@ -10,8 +10,14 @@ import (
 )
 
 type ContentHandler struct {
+	inner http.Handler
+
 	payload     []byte
 	contentType string
+}
+
+func (this *ContentHandler) Install(inner http.Handler) {
+	this.inner = inner
 }
 
 func NewContentStringHandler(payload, contentType string) *ContentHandler {
@@ -22,7 +28,7 @@ func NewContentHandler(payload []byte, contentType string) *ContentHandler {
 		contentType = httpx.ContentTypeOctetStream
 	}
 
-	return &ContentHandler{payload: payload, contentType: contentType}
+	return &ContentHandler{inner: new(NoopHandler), payload: payload, contentType: contentType}
 }
 func NewKeyValueContentHandler(pairs ...string) *ContentHandler {
 	builder := bytes.NewBufferString(keyValueContentSyntax)
@@ -33,6 +39,8 @@ func NewKeyValueContentHandler(pairs ...string) *ContentHandler {
 }
 
 func (this *ContentHandler) ServeHTTP(response http.ResponseWriter, request *http.Request) {
+	this.inner.ServeHTTP(response, request)
+
 	response.Header()[httpx.HeaderContentType] = []string{this.contentType}
 	_, _ = response.Write(this.payload)
 }
