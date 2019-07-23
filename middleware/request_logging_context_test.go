@@ -56,9 +56,9 @@ func (this *LoggingContextFixture) TestRemoteAddressLogged() {
 }
 
 func (this *LoggingContextFixture) TestStartTimeLogged() {
-	this.now = time.Unix(0, 0)
+	this.now = time.Unix(0, 0).UTC()
 	this.createContext()
-	this.So(this.timeStamp(), should.Equal, `31/Dec/1969:17:00:00`)
+	this.So(this.timeStamp(), should.Equal, `01/Jan/1970:00:00:00`)
 }
 
 func (this *LoggingContextFixture) TestRequestMethodLogged() {
