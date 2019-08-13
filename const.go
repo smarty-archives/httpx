@@ -6,18 +6,18 @@ import (
 )
 
 const (
-	HeaderUserAgent     = "User-Agent"
 	HeaderAccept        = "Accept"
-	HeaderReferer       = "Referer"
-	HeaderOrigin        = "Origin"
-	HeaderContentType   = "Content-Type"
 	HeaderContentLength = "Content-Length"
+	HeaderContentType   = "Content-Type"
 	HeaderHost          = "Host"
+	HeaderOrigin        = "Origin"
+	HeaderReferer       = "Referer"
+	HeaderUserAgent     = "User-Agent"
 
-	HeaderAccessControlAllowOrigin      = "Access-Control-Allow-Origin"
 	HeaderAccessControlAllowCredentials = "Access-Control-Allow-Credentials"
-	HeaderAccessControlAllowMethods     = "Access-Control-Allow-Methods"
 	HeaderAccessControlAllowHeaders     = "Access-Control-Allow-Headers"
+	HeaderAccessControlAllowMethods     = "Access-Control-Allow-Methods"
+	HeaderAccessControlAllowOrigin      = "Access-Control-Allow-Origin"
 	HeaderAccessControlMaxAgeSeconds    = "Access-Control-Max-Age"
 
 	HeaderXForwardedFor = "X-Forwarded-For"
@@ -33,11 +33,11 @@ var (
 	}, ", ")
 	DefaultCORSHeaders = strings.Join([]string{
 		HeaderAccept,
-		HeaderContentType,
 		HeaderContentLength,
-		HeaderReferer,
-		HeaderOrigin,
+		HeaderContentType,
 		HeaderHost,
+		HeaderOrigin,
+		HeaderReferer,
 	}, ", ")
 )
 
