@@ -126,7 +126,7 @@ func (this *HeadersHandlerFixture) TestDefaultCORSHeadersWritten() {
 
 	this.So(this.response.Header().Get("Access-Control-Allow-Origin"), should.Equal, "*")
 	this.So(this.response.Header().Get("Access-Control-Allow-Methods"), should.Equal, "GET, PUT, POST, DELETE, HEAD")
-	this.So(this.response.Header().Get("Access-Control-Allow-Headers"), should.Equal, "Accept, Content-Length, Content-Type, Host, Origin, Referer")
+	this.So(this.response.Header().Get("Access-Control-Allow-Headers"), should.Equal, "Accept, Authorization, Content-Length, Content-Type, Host, Origin, Referer")
 	this.So(this.response.Header().Get("Access-Control-Allow-Credentials"), should.Equal, "true")
 	this.So(this.response.Header().Get("Access-Control-Max-Age"), should.Equal, "600")
 }

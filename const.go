@@ -7,6 +7,7 @@ import (
 
 const (
 	HeaderAccept        = "Accept"
+	HeaderAuthorization = "Authorization"
 	HeaderContentLength = "Content-Length"
 	HeaderContentType   = "Content-Type"
 	HeaderHost          = "Host"
@@ -33,6 +34,7 @@ var (
 	}, ", ")
 	DefaultCORSHeaders = strings.Join([]string{
 		HeaderAccept,
+		HeaderAuthorization,
 		HeaderContentLength,
 		HeaderContentType,
 		HeaderHost,
