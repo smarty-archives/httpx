@@ -10,7 +10,7 @@ import (
 	"github.com/smartystreets/assertions/should"
 	"github.com/smartystreets/gunit"
 
-	"github.com/smartystreets/httpx"
+	"github.com/smartystreets/httpx/v2"
 )
 
 func TestLoggingContextFixture(t *testing.T) {

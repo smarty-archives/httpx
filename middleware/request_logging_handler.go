@@ -5,9 +5,10 @@ import (
 
 	"github.com/smartystreets/clock"
 
-	"github.com/smartystreets/httpx"
+	"github.com/smartystreets/httpx/v2"
 )
 
+// Deprecated: remove when KAFKA is in place.
 type RequestLoggingHandler struct {
 	clock  *clock.Clock
 	inner  http.Handler
@@ -16,6 +17,7 @@ type RequestLoggingHandler struct {
 	remoteAddressHeader string
 }
 
+// Deprecated: remove when KAFKA is in place.
 func NewRequestLoggingHandler(inner http.Handler, remoteAddressHeader string) *RequestLoggingHandler {
 	return &RequestLoggingHandler{
 		inner:  inner,
