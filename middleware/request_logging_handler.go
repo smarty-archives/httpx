@@ -26,6 +26,8 @@ func NewRequestLoggingHandler(inner http.Handler, remoteAddressHeader string) *R
 		remoteAddressHeader: remoteAddressHeader}
 }
 
+func (this *RequestLoggingHandler) Install(inner http.Handler) { this.inner = inner }
+
 func (this *RequestLoggingHandler) ServeHTTP(response http.ResponseWriter, request *http.Request) {
 	remoteAddress := httpx.ReadClientIPAddress(request, this.remoteAddressHeader)
 	context := newContext(this.clock.UTCNow(), remoteAddress, request, response)
