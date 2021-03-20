@@ -114,7 +114,8 @@ func (this *HTTPServer) Shutdown(timeout time.Duration) error {
 		return nil
 	}
 
-	ctx, _ := context.WithTimeout(context.Background(), timeout)
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
 	return this.inner.Shutdown(ctx)
 }
 
