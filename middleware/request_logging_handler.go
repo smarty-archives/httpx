@@ -2,15 +2,14 @@ package middleware
 
 import (
 	"net/http"
-
-	"github.com/smartystreets/clock"
+	"time"
 
 	"github.com/smartystreets/httpx/v2"
 )
 
 // Deprecated: remove when KAFKA is in place.
 type RequestLoggingHandler struct {
-	clock  *clock.Clock
+	now    func() time.Time
 	inner  http.Handler
 	logger logger
 
@@ -18,11 +17,11 @@ type RequestLoggingHandler struct {
 }
 
 // Deprecated: remove when KAFKA is in place.
-func NewRequestLoggingHandler(inner http.Handler, remoteAddressHeader string) *RequestLoggingHandler {
+func NewRequestLoggingHandler(inner http.Handler, remoteAddressHeader string, now func() time.Time) *RequestLoggingHandler {
 	return &RequestLoggingHandler{
 		inner:  inner,
 		logger: new(contextLogger),
-
+		now: now,
 		remoteAddressHeader: remoteAddressHeader}
 }
 
@@ -30,7 +29,7 @@ func (this *RequestLoggingHandler) Install(inner http.Handler) { this.inner = in
 
 func (this *RequestLoggingHandler) ServeHTTP(response http.ResponseWriter, request *http.Request) {
 	remoteAddress := httpx.ReadClientIPAddress(request, this.remoteAddressHeader)
-	context := newContext(this.clock.UTCNow(), remoteAddress, request, response)
+	context := newContext(this.now(), remoteAddress, request, response)
 	defer this.log(context)
 	this.forward(context, request)
 }
@@ -51,4 +50,8 @@ func (this *RequestLoggingHandler) log(context *loggingContext) {
 	if err != nil {
 		panic(err)
 	}
+}
+
+func utcNow() time.Time {
+	return time.Now().UTC()
 }

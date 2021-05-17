@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/smartystreets/assertions/should"
-	"github.com/smartystreets/clock"
 	"github.com/smartystreets/gunit"
 )
 
@@ -24,6 +23,7 @@ type RequestLoggingHandlerFixture struct {
 	request  *http.Request
 	inner    *FakeHandler
 	now      time.Time
+	clock    func() time.Time
 
 	loggedContext  *loggingContext
 	loggedPanicErr interface{}
@@ -33,9 +33,9 @@ func (this *RequestLoggingHandlerFixture) Setup() {
 	this.request = httptest.NewRequest("GET", "/not-status", nil)
 	this.response = httptest.NewRecorder()
 	this.inner = NewFakeHandler()
-	this.handler = NewRequestLoggingHandler(this.inner, "X-Remote-Address")
 	this.now = time.Now()
-	this.handler.clock = clock.Freeze(this.now)
+	this.clock = func() time.Time { return this.now }
+	this.handler = NewRequestLoggingHandler(this.inner, "X-Remote-Address", this.clock)
 	this.handler.logger = this
 }
 
