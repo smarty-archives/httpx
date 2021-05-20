@@ -23,7 +23,6 @@ type RequestLoggingHandlerFixture struct {
 	request  *http.Request
 	inner    *FakeHandler
 	now      time.Time
-	clock    func() time.Time
 
 	loggedContext  *loggingContext
 	loggedPanicErr interface{}
@@ -34,8 +33,7 @@ func (this *RequestLoggingHandlerFixture) Setup() {
 	this.response = httptest.NewRecorder()
 	this.inner = NewFakeHandler()
 	this.now = time.Now()
-	this.clock = func() time.Time { return this.now }
-	this.handler = NewRequestLoggingHandler(this.inner, "X-Remote-Address", this.clock)
+	this.handler = NewRequestLoggingHandler(this.inner, "X-Remote-Address", func() time.Time{return this.now})
 	this.handler.logger = this
 }
 
