@@ -7,12 +7,9 @@ import (
 	"net/http"
 	"strings"
 	"time"
-
-	"github.com/smartystreets/logging"
 )
 
 type HTTPServer struct {
-	logger         *logging.Logger
 	certificatePEM string
 	keyPEM         string
 	inner          *http.Server
@@ -55,7 +52,7 @@ func (this *HTTPServer) WithTLS(certificatePEM string, tlsConfig *tls.Config) *H
 		if cert, err := tls.X509KeyPair([]byte(certificatePEM), []byte(certificatePEM)); err == nil {
 			tlsConfig.Certificates = append(tlsConfig.Certificates, cert)
 		} else {
-			this.logger.Fatal("[ERROR] Unable to parse TLS certificate data: ", err)
+			log.Fatal("[ERROR] Unable to parse TLS certificate data: ", err)
 		}
 	} else {
 		this.certificatePEM = certificatePEM
@@ -85,13 +82,13 @@ func (this *HTTPServer) Listen() {
 		return
 	}
 
-	this.logger.Printf("[INFO] Listening for HTTP traffic on %s.\n", this.inner.Addr)
+	log.Printf("[INFO] Listening for HTTP traffic on %s.\n", this.inner.Addr)
 	if err := this.listen(); err == nil {
 		return
 	} else if err == http.ErrServerClosed {
-		this.logger.Println("[INFO] HTTP listener shut down gracefully.")
+		log.Println("[INFO] HTTP listener shut down gracefully.")
 	} else {
-		this.logger.Fatal("[ERROR] Unable to listen to HTTP traffic: ", err)
+		log.Fatal("[ERROR] Unable to listen to HTTP traffic: ", err)
 	}
 }
 func (this *HTTPServer) listen() error {
