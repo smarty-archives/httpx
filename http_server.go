@@ -28,6 +28,7 @@ func NewHTTPServer(listenAddress string, handler http.Handler) *HTTPServer {
 			ReadTimeout:    time.Second * 15,
 			WriteTimeout:   time.Second * 15,
 			MaxHeaderBytes: 1024 * 64,
+			ErrorLog:       newServerLogger(),
 		},
 	}
 }
